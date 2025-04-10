@@ -33,14 +33,7 @@ class BottomNavBar extends StatelessWidget {
             Navigator.pushNamed(context, AppRoutes.history);
             break;
           case 2:
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              builder: (context) => const AddReportPopup(),
-            );
+            Navigator.pushNamed(context, AppRoutes.addReport);
 
             break;
           case 3:

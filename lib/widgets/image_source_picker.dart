@@ -26,7 +26,7 @@ void showImageSourcePicker(BuildContext context) {
             title: const Text("Choose from Gallery"),
             onTap: () {
               Navigator.pop(context);
-              context.read<ReportViewModel>().pickImageFromGallery();
+              context.read<ReportViewModel>().pickMultipleImages();
             },
           ),
         ],
