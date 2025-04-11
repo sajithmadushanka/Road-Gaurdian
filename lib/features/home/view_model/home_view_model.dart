@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:road_gurdian/features/auth/model/user_model.dart';
+import 'package:road_gurdian/features/report/model/report_model.dart';
 
 
 class HomeViewModel extends ChangeNotifier {
@@ -34,6 +35,31 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     isLoading = false;
+    notifyListeners();
+  }
+
+  // fetch all reports---------------------------
+  List<ReportModel> allReports = [];
+  bool isReportLoading = false;
+
+  Future<void> fetchAllReports() async {
+    isReportLoading = true;
+    notifyListeners();
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('reports')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      allReports = snapshot.docs
+          .map((doc) => ReportModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      print("Error fetching all reports: $e");
+    }
+
+    isReportLoading = false;
     notifyListeners();
   }
 }

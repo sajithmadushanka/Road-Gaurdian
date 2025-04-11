@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:road_gurdian/app/routes.dart';
+import 'package:road_gurdian/shared/widget/auth_btn.dart';
+import 'package:road_gurdian/shared/widget/auth_text_filed.dart';
+import 'package:road_gurdian/shared/widget/header_text.dart';
 import '../view_model/auth_view_model.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -29,7 +32,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Account created successfully!")),
           );
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          Navigator.pushReplacementNamed(context, AppRoutes.main);
+
         },
       );
     }
@@ -47,45 +51,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
           key: _formKey,
           child: Column(
             children: [
-              const Text(
-                "Create Account",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              // Header----------------------------
+              HeaderText(title: "CREATE AN ACCOUNT"),
               const SizedBox(height: 24),
 
               /// Full Name
-              TextFormField(
+              /// ------------------------------------------------
+              AuthTextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: "Full Name",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
-                ),
+                label: "Full Name",
+                prefixIcon: Icons.person,
                 validator:
                     (val) => val!.isEmpty ? "Full name is required" : null,
               ),
               const SizedBox(height: 16),
 
-              /// Address
-              TextFormField(
+              /// Address----------------------------------------------------------
+              AuthTextField(
                 controller: addressController,
-                decoration: const InputDecoration(
-                  labelText: "Address",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.home),
-                ),
+                label: "Address",
+                prefixIcon: Icons.home,
                 validator: (val) => val!.isEmpty ? "Address is required" : null,
               ),
               const SizedBox(height: 16),
 
-              /// Email
-              TextFormField(
+              /// Email----------------------------------------------------------
+              AuthTextField(
                 controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
+                label: "Email",
+                prefixIcon: Icons.email,
                 validator: (val) {
                   if (val!.isEmpty) return "Email required";
                   if (!RegExp(r'\S+@\S+\.\S+').hasMatch(val)) {
@@ -96,25 +90,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 16),
 
-              /// Password
-              TextFormField(
+              /// Password----------------------------------------------------------
+              /// ----------------------------------------------------------
+              AuthTextField(
                 controller: passwordController,
+                label: "Password",
+                prefixIcon: Icons.lock,
                 obscureText: !isPasswordVisible,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      isPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                    ),
-                    onPressed:
-                        () => setState(
-                          () => isPasswordVisible = !isPasswordVisible,
-                        ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   ),
+                  onPressed:
+                      () => setState(
+                        () => isPasswordVisible = !isPasswordVisible,
+                      ),
                 ),
                 validator:
                     (val) =>
@@ -124,14 +114,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 24),
 
-              /// Submit Button
+              /// Submit Button ------------------------------------------------
               authVM.isLoading
                   ? const CircularProgressIndicator()
                   : SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: AuthBtn(
+                      btnName: "Sign Up",
                       onPressed: () => _onSubmit(authVM),
-                      child: const Text("Create Account"),
                     ),
                   ),
 

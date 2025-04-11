@@ -30,7 +30,11 @@ class _ReportFormState extends State<ReportForm> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final viewModel = Provider.of<ReportViewModel>(context, listen: false);
+    if (kDebugMode) {
+      print("isDark: $isDark");
+    }
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -53,10 +57,13 @@ class _ReportFormState extends State<ReportForm> {
             const SizedBox(height: 12),
 
             const SizedBox(height: 16),
-            // priority level dropdown --------------------------------
-            const Text(
+            // Priority level dropdown
+            Text(
               "Priority Level",
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 8),
             DropdownPriorityLevel(
@@ -66,7 +73,7 @@ class _ReportFormState extends State<ReportForm> {
             ),
             const SizedBox(height: 16),
 
-            // upload image button if not images available ---------------------
+            // Upload image section
             Consumer<ReportViewModel>(
               builder: (context, viewModel, child) {
                 final imagesList = viewModel.images;
@@ -77,7 +84,9 @@ class _ReportFormState extends State<ReportForm> {
                     height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(
+                        color: isDark ? Colors.grey : Colors.yellow,
+                      ),
                     ),
                     clipBehavior: Clip.hardEdge,
                     child: child,
@@ -93,17 +102,28 @@ class _ReportFormState extends State<ReportForm> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.yellow, width: 0.5),
+                        border: Border.all(
+                          color:
+                              isDark
+                                  ? Colors.grey
+                                  : Theme.of(context).primaryColor,
+                          width: 0.5,
+                        ),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.upload_file, color: Colors.white),
-                            SizedBox(width: 8),
+                            Icon(
+                              Icons.upload_file,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            const SizedBox(width: 8),
                             Text(
                               "Upload Photos",
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
                             ),
                           ],
                         ),
@@ -168,11 +188,10 @@ class _ReportFormState extends State<ReportForm> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
                                   child: buildImageTile(
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                      ),
+                                    child: Icon(
+                                      Icons.add,
+                                      color:
+                                          isDark ? Colors.white : Colors.black,
                                     ),
                                   ),
                                 ),
@@ -182,9 +201,12 @@ class _ReportFormState extends State<ReportForm> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Tap the + to upload media. Max 3 files, 5MB each.",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[700],
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   );
@@ -193,14 +215,18 @@ class _ReportFormState extends State<ReportForm> {
             ),
 
             const SizedBox(height: 12),
-
-            // Show images source picker button
             const SizedBox(height: 20),
+
+            // Submit button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
+                  backgroundColor:
+                      isDark
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.primary,
+                  foregroundColor: isDark ? Colors.black : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -227,15 +253,10 @@ class _ReportFormState extends State<ReportForm> {
                       viewModel.clearImages();
 
                       // Navigate to home
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.home,
-                        (route) => false,
-                      );
+                      Navigator.pushReplacementNamed(context, AppRoutes.main);
                     }
                   }
                 },
-
                 child: const Text(
                   "Submit",
                   style: TextStyle(fontWeight: FontWeight.bold),

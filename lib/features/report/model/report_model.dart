@@ -11,8 +11,8 @@ class ReportModel {
   final DateTime? createdAt;
 
   ReportModel({
-   required this.id,
-   required this.userId,
+    required this.id,
+    required this.userId,
     required this.title,
     required this.description,
     required this.priorityLevel,
@@ -35,16 +35,25 @@ class ReportModel {
       'createdAt': createdAt?.toIso8601String(),
     };
   }
+
   factory ReportModel.fromJson(Map<String, dynamic> json) {
+    final locationData = json['location'];
+    final GeoPoint location =
+        (locationData is GeoPoint)
+            ? locationData
+            : GeoPoint(locationData['latitude'], locationData['longitude']);
+
     return ReportModel(
       id: json['id'],
       userId: json['userId'],
       title: json['title'],
       description: json['description'],
       priorityLevel: json['priorityLevel'],
-      location: json['location'],
-      images: json['images'],
+      location: location,
+      images: List<String>.from(json['images'] ?? []),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
+  double get latitude => location.latitude;
+  double get longitude => location.longitude;
 }
