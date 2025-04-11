@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../features/report/view_model/report_view_model.dart';
 
-void showImageSourcePicker(BuildContext context) {
+
+void showImageSourcePicker(BuildContext context, viewModel) {
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -18,7 +17,7 @@ void showImageSourcePicker(BuildContext context) {
             title: const Text("Take a Photo"),
             onTap: () {
               Navigator.pop(context);
-              context.read<ReportViewModel>().pickImageFromCamera();
+              viewModel.pickImageFromCamera();
             },
           ),
           ListTile(
@@ -26,7 +25,7 @@ void showImageSourcePicker(BuildContext context) {
             title: const Text("Choose from Gallery"),
             onTap: () {
               Navigator.pop(context);
-              context.read<ReportViewModel>().pickMultipleImages();
+              viewModel.pickMultipleImages();
             },
           ),
         ],

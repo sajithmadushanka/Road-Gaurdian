@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       onGenerateRoute: AppRoutes.generateRoute,
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.signin,
     );
   }
 }

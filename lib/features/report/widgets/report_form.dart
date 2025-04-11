@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:road_gurdian/app/routes.dart';
 import 'package:road_gurdian/features/report/view_model/report_view_model.dart';
+import 'package:road_gurdian/features/report/widgets/dropdown_priority_level.dart';
 import 'package:road_gurdian/features/report/widgets/text_form_filed.dart';
 import 'package:road_gurdian/utils/show_submission_dialog_helper.dart';
 import 'package:road_gurdian/widgets/image_source_picker.dart';
 
 class ReportForm extends StatefulWidget {
-  final ReportViewModel viewModel;
-  const ReportForm({super.key, required this.viewModel});
+  const ReportForm({super.key});
 
   @override
   State<ReportForm> createState() => _ReportFormState();
@@ -22,10 +22,15 @@ class _ReportFormState extends State<ReportForm> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
 
+  var priority_level = "Low"; // default to low
+
+  void setPriorityLevel(String value) {
+    priority_level = value;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final imagesList = widget.viewModel.images;
-    final viewModel = Provider.of<ReportViewModel>(context);
+    final viewModel = Provider.of<ReportViewModel>(context, listen: false);
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -47,6 +52,18 @@ class _ReportFormState extends State<ReportForm> {
             ),
             const SizedBox(height: 12),
 
+            const SizedBox(height: 16),
+            // priority level dropdown --------------------------------
+            const Text(
+              "Priority Level",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            DropdownPriorityLevel(
+              onChanged: (value) {
+                setPriorityLevel(value!);
+              },
+            ),
             const SizedBox(height: 16),
 
             // upload image button if not images available ---------------------
@@ -70,7 +87,7 @@ class _ReportFormState extends State<ReportForm> {
                 if (imagesList.isEmpty) {
                   return GestureDetector(
                     onTap: () {
-                      showImageSourcePicker(context);
+                      showImageSourcePicker(context, viewModel);
                     },
                     child: Container(
                       padding: const EdgeInsets.all(16),
@@ -120,9 +137,7 @@ class _ReportFormState extends State<ReportForm> {
                                         top: 0,
                                         child: GestureDetector(
                                           onTap: () {
-                                            viewModel.removeImage(
-                                              index,
-                                            ); // Ensure this method exists
+                                            viewModel.removeImage(index);
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
@@ -145,7 +160,11 @@ class _ReportFormState extends State<ReportForm> {
                               );
                             } else {
                               return GestureDetector(
-                                onTap: () => showImageSourcePicker(context),
+                                onTap:
+                                    () => showImageSourcePicker(
+                                      context,
+                                      viewModel,
+                                    ),
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
                                   child: buildImageTile(
@@ -192,9 +211,11 @@ class _ReportFormState extends State<ReportForm> {
                     final result = await showSubmissionDialog(
                       context,
                       () async {
-                        return await widget.viewModel.submitReport(
+                        return await viewModel.submitReport(
                           titleController.text,
                           descriptionController.text,
+                          context,
+                          priority_level,
                         );
                       },
                     );

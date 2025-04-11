@@ -1,9 +1,16 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:road_gurdian/features/report/model/report_model.dart';
+import 'package:road_gurdian/utils/img_compress.dart';
+import 'package:road_gurdian/utils/location_helper.dart';
+import 'package:uuid/uuid.dart';
 
 class ReportViewModel extends ChangeNotifier {
   File? selectedImage;
@@ -61,16 +68,24 @@ class ReportViewModel extends ChangeNotifier {
 
     if (status.isGranted) {
       if (source == ImageSource.gallery) {
+        if (kDebugMode) print("Permission granted for $source");
         if (isMultiple) {
           final pickedFiles = await _picker.pickMultiImage(
             imageQuality: 100,
             maxWidth: 800,
             maxHeight: 800,
           );
-          if (pickedFiles.isNotEmpty) {
-            images.addAll(pickedFiles);
-            notifyListeners();
+          for (final file in pickedFiles) {
+            final compressed = await compressXFile(file);
+            if (kDebugMode) print("compressed image: ${compressed?.path}");
+            if (compressed != null) images.add(compressed);
+            if (kDebugMode) {
+              print("picked file: ${file.path}");
+              print("compressed file: ${compressed?.path}");
+              print("imaged $images");
+            }
           }
+          notifyListeners();
         } else {
           final pickedFile = await _picker.pickImage(
             source: source,
@@ -79,7 +94,8 @@ class ReportViewModel extends ChangeNotifier {
             maxHeight: 800,
           );
           if (pickedFile != null) {
-            images.add(pickedFile); // Add single image to list
+            final compressed = await compressXFile(pickedFile);
+            if (compressed != null) images.add(compressed);
             notifyListeners();
           }
         }
@@ -88,7 +104,8 @@ class ReportViewModel extends ChangeNotifier {
       else {
         final pickedFile = await _picker.pickImage(source: source);
         if (pickedFile != null) {
-          images.add(pickedFile); // Add single image to list
+          final compressed = await compressXFile(pickedFile);
+          if (compressed != null) images.add(compressed);
           notifyListeners();
         }
       }
@@ -104,7 +121,12 @@ class ReportViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> submitReport(String title, String description) async {
+  Future<bool> submitReport(
+    String title,
+    String description,
+    BuildContext context,
+    priority_level,
+  ) async {
     if (kDebugMode) {
       print("Report submitted with title: $title");
       print("Description: $description");
@@ -116,9 +138,21 @@ class ReportViewModel extends ChangeNotifier {
         final firestore = FirebaseFirestore.instance;
         final storage = FirebaseStorage.instance;
 
+        // Get current location
+        final position = await LocationHelper.getCurrentLocation(
+          context: context,
+          onStatus: (msg) => print("[Location] $msg"),
+        );
+        if (position == null) {
+          setLoading(false);
+          return false; // Prevent saving with null location
+        }
+
         // Upload images to Firebase Storage
         List<String> imageUrls = [];
-
+        if (kDebugMode) {
+          print("imagesList $images");
+        }
         for (var image in images) {
           final file = File(image.path);
           final fileName = DateTime.now().millisecondsSinceEpoch.toString();
@@ -129,12 +163,20 @@ class ReportViewModel extends ChangeNotifier {
         }
 
         // Save report data to Firestore
-        await firestore.collection('reports').add({
-          'title': title,
-          'description': description,
-          'images': imageUrls,
-          'timestamp': FieldValue.serverTimestamp(),
-        });
+      final ReportModel report = ReportModel(
+          id: Uuid().v4(),
+          userId: FirebaseAuth.instance.currentUser!.uid,
+          title: title,
+          description: description,
+          priorityLevel: priority_level,
+          location: GeoPoint(
+            position.latitude,
+            position.longitude,
+          ),
+          images: imageUrls,
+          createdAt: DateTime.now(),
+        );
+        await firestore.collection('reports').add(report.toJson());
         if (kDebugMode) {
           print("Report submitted successfully");
         }

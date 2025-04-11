@@ -25,7 +25,7 @@ class AddReportPopup extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ReportForm(viewModel: viewModel),
+          ReportForm(),
         ],
       ),
     );

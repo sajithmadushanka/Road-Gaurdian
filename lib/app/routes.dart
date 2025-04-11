@@ -29,7 +29,7 @@ class AppRoutes {
       case signin:
         return MaterialPageRoute(builder: (_) => const SigninScreen());
       case signup:
-        return MaterialPageRoute(builder: (_) => const SignupScreen());
+        return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case forgotpassword:
         return MaterialPageRoute(builder: (_) => const ForgotpasswordScreen());
       case history:
