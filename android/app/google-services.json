@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "405078847226",
+    "project_id": "road-gaurdian",
+    "storage_bucket": "road-gaurdian.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405078847226:android:c24c1bd8dce6c6fdcee343",
+        "android_client_info": {
+          "package_name": "com.example.road_gurdian"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByBUJVbT40Es8taWSAM2eaPl7o50iNJFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

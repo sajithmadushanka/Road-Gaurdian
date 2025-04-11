@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:road_gurdian/app/routes.dart';
 import 'package:road_gurdian/features/report/view_model/report_view_model.dart';
 import 'package:road_gurdian/features/report/widgets/text_form_filed.dart';
+import 'package:road_gurdian/utils/show_submission_dialog_helper.dart';
 import 'package:road_gurdian/widgets/image_source_picker.dart';
 
 class ReportForm extends StatefulWidget {
@@ -22,7 +25,7 @@ class _ReportFormState extends State<ReportForm> {
   @override
   Widget build(BuildContext context) {
     final imagesList = widget.viewModel.images;
-    print("item count------------------ ${imagesList.length}");
+    final viewModel = Provider.of<ReportViewModel>(context);
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -184,15 +187,34 @@ class _ReportFormState extends State<ReportForm> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    widget.viewModel.submitReport(
-                      titleController.text,
-                      descriptionController.text,
+                    final result = await showSubmissionDialog(
+                      context,
+                      () async {
+                        return await widget.viewModel.submitReport(
+                          titleController.text,
+                          descriptionController.text,
+                        );
+                      },
                     );
-                    Navigator.pop(context);
+
+                    if (result && context.mounted) {
+                      // Clear fields after success
+                      titleController.clear();
+                      descriptionController.clear();
+                      viewModel.clearImages();
+
+                      // Navigate to home
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.home,
+                        (route) => false,
+                      );
+                    }
                   }
                 },
+
                 child: const Text(
                   "Submit",
                   style: TextStyle(fontWeight: FontWeight.bold),
