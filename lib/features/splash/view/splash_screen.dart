@@ -11,15 +11,27 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // const Image(image: imageAsset('assets/images/logo.png')),
+            Image(image: AssetImage('assets/images/logo.png')),
             const Text('Welcome to Road Guardian'),
             const SizedBox(height: 20),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+              ),
               onPressed: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.main);
-
+                Navigator.pushReplacementNamed(context, AppRoutes.main);
               },
-              child: const Text('Go'),
+              child: const Text(
+                'Go',
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
             ),
           ],
         ),

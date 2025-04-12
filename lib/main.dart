@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:road_gurdian/app/app.dart';
 import 'package:road_gurdian/features/auth/view_model/auth_view_model.dart';
@@ -10,8 +11,15 @@ import 'package:road_gurdian/firebase_options.dart';
 import 'package:road_gurdian/shared/theme/theme_provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  //  Preserve the native splash screen until ready---------
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  //  Remove splash screen after init---------
+  FlutterNativeSplash.remove();
 
   runApp(
     MultiProvider(

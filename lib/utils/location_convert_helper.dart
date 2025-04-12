@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationHelperConvert {
@@ -6,10 +7,19 @@ class LocationHelperConvert {
       final placemarks = await placemarkFromCoordinates(lat, lng);
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
-        return "${place.street}, ${place.locality}, ${place.country}";
+        final street =
+            (place.street != null &&
+                    place.street!.contains(RegExp(r'[a-zA-Z]')))
+                ? place.street
+                : '';
+
+        /// check whether street contains any letters to prevent showing  not identify road  in the address
+        return "${street!.isNotEmpty ? '$street, ' : ''}${place.locality}, ${place.country}";
       }
     } catch (e) {
-      print("Geocoding failed: $e");
+      if (kDebugMode) {
+        print("Error getting address: $e");
+      }
     }
     return "Unknown location";
   }

@@ -7,7 +7,6 @@ import 'package:road_gurdian/features/auth/view/signup_screen.dart';
 import 'package:road_gurdian/features/auth/view/forgotpassword_screen.dart';
 import 'package:road_gurdian/features/admin/view/admin_dashboard.dart';
 
-
 class AppRoutes {
   static const String splash = '/';
   static const String main = '/main';
